@@ -19,7 +19,7 @@ public:
     void printGraph() {
       for (int i = 0; i < V; i++) {
          cout << "Adjacency list of vertex " << loc[i] << ": ";
-         for (const auto& node : head[i]) {
+         for (auto node : head[i]) {
             cout << loc[node] << " ";
             cout<<"-->";
          }
@@ -95,7 +95,7 @@ int main() {
         cout<<endl;
         int choice;
         do{
-        cout<<"1.DFS /n 2.BFS /n 3.exit"<<endl;
+        cout<<"1.DFS \n 2.BFS \n 3.exit"<<endl;
         cin>>choice;
         switch(choice)
         {
