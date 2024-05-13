@@ -1,71 +1,77 @@
-#include <iostream>
-#include <queue>
-#include<list>
+#include <bits/stdc++.h>
 using namespace std;
-
-class Graph
+const int ite = 100;
+class topo
 {
-    int V;
-    list<int> *adj;
-     string land[4]={"A","B","C","D"};
-
-	public :
-	
-    Graph(int V)
+public:
+    string name[ite];
+    int limit = 0, V;
+    list<int> *head;
+    topo(int V)
     {
         this->V = V;
-        adj = new list<int>[V];
+        head = new list<int>[V];
     }
-
-    void addEdge(int u, int v)
+    void adde(string a, string b)
     {
-        adj[u].push_back(v);
+        int ai = getnum(a);
+        int bi = getnum(b);
+        head[ai].push_back(bi);
     }
-   
-    void displayList()
+    int getnum(string names)
     {
-        cout << "Adjacency List:" << endl;
-        for (int i = 0; i < V; i++)
+        for (int i = 0; i < limit; i++)
         {
-            cout << land[i]<< " -> ";
-            for (int& node : adj[i])
-                cout << land[node]<< " ";
-            cout << endl;
-        }
-    }
-
-    void topologicalSort()
-    {
-        vector<int> inDegree(V, 0);
-
-        for (int u = 0; u < V; u++)
-        {
-            for (auto v : adj[u])
+            if (names == name[i])
             {
-                inDegree[v]++;
+                return i;
             }
         }
-
-        queue<int> q;
-       
+        name[limit] = names;
+        return limit++;
+    }
+    void printlist()
+    {
+        for (int i = 0; i < V; i++)
+        {
+            cout << name[i] << "-->";
+            for (auto node : head[i])
+            {
+                cout << name[node] << "-->";
+            }
+            cout<<endl;
+        }
+    }
+    void toplogicalsort()
+    {
+        vector<int> indegree(V, 0); // creates vecotor of size  V with all 0
+        // first for loop iterate througha all graph and then 2nd for loop iterate theough node connected to node
         for (int u = 0; u < V; u++)
         {
-            if (inDegree[u] == 0)
+            for (auto v : head[u])
+            {
+                indegree[v]++;
+            }
+        }
+        queue<int> q;
+
+        for (int u = 0; u < V; u++)
+        {
+            if (indegree[u] == 0)
             {
                 q.push(u);
             }
         }
-
         while (!q.empty())
         {
             int u = q.front();
             q.pop();
             cout << u << " ";
 
-         
-            for (auto v : adj[u])
+            for (auto v : head[u])
             {
-                if (--inDegree[v] == 0)
+                --indegree[v];
+                if (indegree[v] == 0)
                 {
                     q.push(v);
                 }
@@ -73,20 +79,48 @@ class Graph
         }
     }
 };
-
 int main()
 {
-    Graph g(4);
-    g.addEdge(0, 1);
-    g.addEdge(0, 2);
-    g.addEdge(1, 3);
-    g.addEdge(2, 3);
-    
-    g.displayList();
-
-    cout << "Topological Sort : ";
-    g.topologicalSort();
-    cout<<endl;
-    
-    return 0;
+    int n, choice;
+    cout << "Total no. of tasks:";
+    cin >> n;
+    topo t(n);
+    do
+    {
+        cout << "1.add edge" << endl
+             << "2.display list" << endl
+             << "3.topological sort" << endl
+             << "4.exit" << endl
+             << "Enter A choice:";
+        cin >> choice;
+        switch (choice)
+        {
+        case 1:
+        {
+            string a, b;
+            cout << "task 1:";
+            cin >> a;
+            cout << "task 2:";
+            cin >> b;
+            t.adde(a, b);
+            break;
+        }
+        case 2:
+        {
+            t.printlist();
+            break;
+        }
+        case 3:
+        {
+            t.toplogicalsort();
+            break;
+        }
+        case 4:
+        {
+            cout << "exiting" << endl;
+            return 0;
+        }
+        }
+       
+    } while (choice != 5);
 }

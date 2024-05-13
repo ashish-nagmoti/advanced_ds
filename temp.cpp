@@ -1,131 +1,126 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 using namespace std;
 const int ite = 100;
-class gtr{
-	public:
-	int V ,limit=0;
-	string loc[ite] = {""};
-	list<int> *head;
-	gtr(int V){
-		this->V = V;
-		head = new list<int>[V];
-	}
-	
-	void addEdge(string v , string w)
-	{
-		int vi = getnum(v);
-		int wi = getnum(w);
-		head[vi].push_back(wi);
-	}
-
-	void printGraph(){
-		for(int i=0;i<V;i++)
-		{
-			cout<<loc[i]<<"-->";
-			for(auto node:head[i]){
-				cout<<loc[node]<<"-->";
-			}
-			cout<<endl;
-		}
-	}
-	void dfsutil(int m, bool visited[]){
-	visited[m] = true;
-	cout<<loc[m]<<"-->";
-	
-	for(auto node:head[m])
-	{
-		if(!visited[node])
-		{ dfsutil(node,visited);
-	}
-	}
-	}
-	void DFS(int m){
-	bool *visited  = new bool[V];
-	for(int i=0;i<V;i++)
+class topo
 {
-	visited[i]=false;
-}
-	dfsutil(m,visited);
-	}
+public:
+    string name[ite];
+    int limit = 0, V;
+    list<int> *head;
+    topo(int V)
+    {
+        this->V = V;
+        head = new list<int>[V];
+    }
+    void adde(string a, string b)
+    {
+        int ai = getnum(a);
+        int bi = getnum(b);
+        head[ai].push_back(bi);
+    }
+    int getnum(string names)
+    {
+        for (int i = 0; i < limit; i++)
+        {
+            if (names == name[i])
+            {
+                return i;
+            }
+        }
+        name[limit] = names;
+        return limit++;
+    }
+    void printlist()
+    {
+        for (int i = 0; i < V; i++)
+        {
+            cout << name[i] << "-->";
+            for (auto node : head[i])
+            {
+                cout << name[node] << "-->";
+            }
+            cout<<endl;
+        }
+    }
+    void toplogicalsort()
+    {
+        vector<int> indegree(V, 0); // creates vecotor of size  V with all 0
+        // first for loop iterate througha all graph and then 2nd for loop iterate theough node connected to node
+        for (int u = 0; u < V; u++)
+        {
+            for (auto v : head[u])
+            {
+                indegree[v]++;
+            }
+        }
+        queue<int> q;
 
- 	void BFS(int m)
-	{
-		bool *visited  = new bool[V];
-		for(int i=0;i<V;i++)
-		{
-			visited[i]=false;
-		}
-		queue<int> q;
-		visited[m]=true;
-		q.push(m);
-		while(!q.empty())
-		{
-		m=q.front();
-		cout<<loc[m]<<"->";
-		q.pop();
-		for(auto i :head[m])
-		{
-			if(!visited[i])
-			{
-				visited[i]=true;
-				q.push(i);
-			}
-		}	
-		}
-	}
-	int getnum(string city)
-	{	
-		for(int i=0;i<limit;i++)
-		{
-			if(city == loc[i])
-			{return i;}
-		}
-		loc[limit] = city;
-		return limit++;	
-	}
+        for (int u = 0; u < V; u++)
+        {
+            if (indegree[u] == 0)
+            {
+                q.push(u);
+            }
+        }
+        while (!q.empty())
+        {
+            int u = q.front();
+            q.pop();
+            cout << u << " ";
+
+            for (auto v : head[u])
+            {
+                --indegree[v];
+                if (indegree[v] == 0)
+                {
+                    q.push(v);
+                }
+            }
+        }
+    }
 };
-int main(){
-	cout<<"How many Places you wan to include:";
-	int n,choice;
-	cin>>n;
-	gtr g(n);
-	do{
-	cout<<"1.Add route"<<endl<<"2.print graph"<<endl<<"3.DFS"<<endl<<"4.BFS"<<endl<<"5.exit"<<endl<<"Enter a choice:";
-	cin>>choice;
-	switch(choice)
-	{
-		case 1:
-			{
-				string source ,dest;
-                cout << "Enter source: ";
-    cin >> source;
-    cout << "Enter destination: ";
-    cin >> dest;
-				g.addEdge(source,dest);
-				break;
-			}
-		case 2:
-			{
-				g.printGraph();
-				break;
-			}
-		case 3:
-			{
-				g.DFS(0);
-				break;
-			}
-		case 4:
-			{
-				g.BFS(0);
-				break;
-			}
-		case 5:
-			{
-				cout<<"exiting....."<<endl;
-				return 0; 
-			}
-		
-	}
-}while(choice!=5);
-return 0;	
+int main()
+{
+    int n, choice;
+    cout << "Total no. of tasks:";
+    cin >> n;
+    topo t(n);
+    do
+    {
+        cout << "1.add edge" << endl
+             << "2.display list" << endl
+             << "3.topological sort" << endl
+             << "4.exit" << endl
+             << "Enter A choice:";
+        cin >> choice;
+        switch (choice)
+        {
+        case 1:
+        {
+            string a, b;
+            cout << "task 1:";
+            cin >> a;
+            cout << "task 2:";
+            cin >> b;
+            t.adde(a, b);
+            break;
+        }
+        case 2:
+        {
+            t.printlist();
+            break;
+        }
+        case 3:
+        {
+            t.toplogicalsort();
+            break;
+        }
+        case 4:
+        {
+            cout << "exiting" << endl;
+            return 0;
+        }
+        }
+       
+    } while (choice != 5);
 }
