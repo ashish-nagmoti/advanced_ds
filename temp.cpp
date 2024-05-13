@@ -2,104 +2,220 @@
 using namespace std;
 struct Node
 {
-    int data;
+    string val;
+    int key;
     Node *left;
     Node *right;
-    
-    Node(int data) : data(data), left(nullptr), right(nullptr){};
+    int height;
+    Node(int key, string val) : key(key), val(val), left(nullptr), right(nullptr), height(1){};
 };
 
-Node *buildTree(int pre[], int in[], int instart, int inend, int& preindex)
+int height(Node *N)
 {
-    if (instart > inend)
+    if (N == nullptr)
     {
-        return NULL;
+        return 0;
     }
-    int index;
-    Node *newn = new Node(pre[preindex++]);
-    if (instart == inend)
+    return N->height;
+}
+
+int max(int a, int b)
+{
+    return (a > b) ? a : b;
+}
+
+Node *rightrotate(Node *y)
+{
+    Node *x = y->left;
+    Node *t = x->right;
+
+    x->right = y;
+    y->left = t;
+
+    y->height = max(height(y->left), height(y->right)) + 1;
+    x->height = max(height(x->left), height(x->right)) + 1;
+
+    return x;
+}
+Node *leftrotate(Node *y)
+{
+    Node *x = y->right;
+    Node *t = x->left;
+
+    x->left = y;
+    y->right = t;
+
+    y->height = max(height(y->left), height(y->right)) + 1;
+    x->height = max(height(x->left), height(x->right)) + 1;
+
+    return x;
+}
+Node *minNode(Node *node)
+{
+    Node *current = node;
+
+    while (current && current->left != nullptr)
+        current = current->left;
+
+    return current;
+}
+
+int getBalance(Node *n)
+{
+    if (n == nullptr)
     {
-        return newn;
+        return 0;
     }
-    for (int i = instart; i <= inend; i++)
+    return height(n->left) - height(n->right);
+}
+
+Node *insert(Node *&node, int key, string val)
+{
+    if (node == nullptr)
     {
-        if (in[i] == newn->data)
+        return new Node(key, val);
+    }
+    if (key < node->key)
+    {
+        node->left = insert(node->left, key, val);
+    }
+    else if (key > node->key)
+    {
+        node->right = insert(node->right, key, val);
+    }
+    else
+    {
+        return node;
+    }
+
+    node->height = max(height(node->left), height(node->right)) + 1;
+    int balance = getBalance(node);
+
+    if (balance > 1 && key < node->left->key)
+    {
+        return rightrotate(node);
+    }
+    if (balance < -1 && key > node->right->key)
+    {
+        return leftrotate(node);
+    }
+    if (balance > 1 && key > node->left->key)
+    {
+        node->left = leftrotate(node->left);
+        return rightrotate(node);
+    }
+    if (balance < -1 && key < node->right->key)
+    {
+        node->right = rightrotate(node->right);
+        return leftrotate(node);
+    }
+    return node;
+}
+void inorder(Node *root)
+{
+    if (root != nullptr)
+    {
+        inorder(root->left);
+        cout << root->key << " " << root->val << endl;
+        inorder(root->right);
+    }
+}
+Node *del(Node *root, int key)
+{
+    if (root == nullptr)
+        return root;
+    if (key < root->key)
+        root->left = del(root->left, key);
+    else if (key > root->key)
+        root->right = del(root->right, key);
+    else
+    {
+        if (root->left == nullptr)
         {
-            index = i;
-            break;
+            Node *temp = root->right;
+            delete root;
+            return temp;
         }
+        else if (root->right == nullptr)
+        {
+            Node *temp = root->left;
+            delete root;
+            return temp;
+        }
+        Node *temp = minNode(root->right);
+        root->key = temp->key;
+        root->val = temp->val;
+
+        root->right = del(root->right, temp->key);
     }
-    newn->left = buildTree(pre, in, instart, index - 1, preindex);
-    newn->right = buildTree(pre, in, index + 1, inend,  preindex);
-    return newn;
-}
-void printPreorder(Node *root)
-{
-    if (root == NULL)
-        return;
-    cout << root->data << " ";
-    printPreorder(root->left);
-    printPreorder(root->right);
+    if (root == nullptr)
+        return root;
+
+    // Step 2: Update the height of the current node
+    root->height = 1 + max(height(root->left), height(root->right));
+
+    // Step 3: Get the balance factor
+    int balance = getBalance(root);
+
+    // Step 4: If the node is unbalanced, then try out the 4 cases
+    // Left Left Case
+    if (balance > 1 && getBalance(root->left) >= 0)
+        return rightrotate(root);
+
+    // Left Right Case
+    if (balance > 1 && getBalance(root->left) < 0)
+    {
+        root->left = leftrotate(root->left);
+        return rightrotate(root);
+    }
+
+    // Right Right Case
+    if (balance < -1 && getBalance(root->right) <= 0)
+        return leftrotate(root);
+
+    // Right Left Case
+    if (balance < -1 && getBalance(root->right) > 0)
+    {
+        root->right = rightrotate(root->right);
+        return leftrotate(root);
+    }
+
+    return root;
 }
 
-void printInorder(Node *root)
-{
-    if (root == NULL)
-        return;
-    printInorder(root->left);
-    cout << root->data << " ";
-    printInorder(root->right);
-}
-
-void printPostorder(Node *root)
-{
-    if (root == NULL)
-        return;
-    printPostorder(root->left);
-    printPostorder(root->right);
-    cout << root->data << " ";
-}
 int main()
 {
     int choice;
-    int n;
-    cout << "No of elements in order:";
-    cin >> n;
-    int pre[n], in[n];
-    for (int i = 0;i < n; i++)
-    {
-        cout << "pre:";
-        cin >> pre[i];
-    }
-    for (int i = 0;i < n; i++)
-    {
-        cout << "in:";
-        cin >> in[i];
-    }
-    int preindex = 0;
-    Node *root = buildTree(pre, in, 0, n - 1, preindex);
-
+    Node *root = nullptr;
     do
     {
-        cout << "1.preorder" << endl
-             << "2.postorder" << endl
-             << "3.inorder" << endl
-             << "4.exit" << endl
-             << "enter a choice:";
+        cout << "1.insert" << endl
+             << "2.inorder" << endl
+             << "3.del node" << endl
+             << "4.exit" << "Neter a choice";
         cin >> choice;
         switch (choice)
         {
         case 1:
-            printPreorder(root);
-            break;
+            {int k;
+            string val;
+            cout << "enter a key(int):";
+            cin >> k;
+            cout << "enter a val";
+            cin >> val;
+            root = insert(root, k, val);
+            break;}
         case 2:
-            printPostorder(root);
-            break;
+            {inorder(root);
+            break;}
         case 3:
-            printInorder(root);
-            break;
+            {int key;
+            cout << "key you want to del";
+            cin >> key;
+            root = del(root, key);
+            break;}
         case 4:
-            cout << "exiting";
+            cout << "exitintg";
             return 0;
         }
     } while (choice != 4);
