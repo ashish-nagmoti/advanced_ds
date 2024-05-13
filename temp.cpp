@@ -2,131 +2,192 @@
 using namespace std;
 struct Node
 {
-    char data;
+    char key;
+    string value;
     Node *left;
     Node *right;
-    Node(char value) : data(value), left(nullptr), right(nullptr) {}
+    Node(char k, string v) : key(k), value(v), left(nullptr), right(nullptr){};
 };
-
-Node *expressionTree(string prefix)
+Node *insert(Node *root, char key, string value)
 {
-    stack<Node*> st;
-    for (int i = prefix.size() - 1; i >= 0; i--)
+    if (root == NULL)
     {
-        char ch = prefix[i];
-        if (isalnum(ch))
-        {
-            Node *temp = new Node(ch);
-            st.push(temp);
-        }
-        else
-        {
-            Node *temp = new Node(ch);
-            temp->left = st.top();
-            st.pop();
-            temp->right = st.top();
-            st.pop();
-            st.push(temp);
-        }
+        return new Node(key, value);
     }
-    return st.top();
-}
-
-void level(Node *root)
-{
-    if (root == nullptr)
+    if (key < root->key)
     {
-        cout<<"empty tree";
-        return ;
+        root->left = insert(root->left, key, value);
     }
-    queue<Node*> q;
-    q.push(root);
-    cout << "level" << endl;
-    while (!q.empty())
+    else if (key > root->key)
     {
-        int level = q.size();
-
-        for (int i = 0; i < level; i++)
-        {
-            Node *curr = q.front();
-            q.pop();
-            cout << curr->data << " ";
-            if (curr->left)
-            {
-                q.push(curr->left);
-            }
-            if (curr->right)
-            {
-                q.push(curr->right);
-            }
-        }
-        cout << endl;
+        root->right = insert(root->right, key, value);
     }
+    return root;
 }
-void postOrderTraversal(Node *root)
-{
-    if (root == nullptr)
-        cout<<"empty tree";
-        return ;
-    postOrderTraversal(root->left);
-    postOrderTraversal(root->right);
-    cout << root->data << " ";
-}
-
-void swaptreepointer(Node *root)
-{
-    if (root == nullptr)
-    {
-        cout<<"empty tree";
-        return ;
-    }
-    swap(root->left, root->right);
-    swaptreepointer(root->left);
-    swaptreepointer(root->right);
-}
-void deletetree(Node *root)
+void inorder(Node *root)
 {
     if (root == nullptr)
     {
         return;
     }
-    deletetree(root->left);
-    deletetree(root->right);
-    cout << "expression to be deleted" << root->data;
-    delete root;
-    root = nullptr;
+    inorder(root->left);
+    cout << "\t" << root ->key << "\t" << root->value << endl;
+    inorder(root->right);
 }
+Node *search(Node *root, char key)
+{
+    if (root == NULL)
+    {
+        return nullptr;
+    }
+    if (root->key == key)
+    {
+        return root;
+    }
+    if (key < root->key)
+    {
+        return search(root->left, key);
+    }
+    else if (key > root->key)
+    {
+        return search(root->right, key);
+    }
+}
+Node *findMin(Node *root)
+{
+    if (root == nullptr)
+    {
+        return nullptr;
+    }
 
+    while (root->left != nullptr)
+    {
+        root = root->left;
+    }
+    return root;
+}
+Node *del(Node *root, char key)
+{
+    if (root == nullptr)
+    {
+        return nullptr;
+    }
+    else if (key < root->key)
+    {
+        root->left = del(root->left, key);
+    }
+    else if (key > root->key)
+    {
+        root->right = del(root->right, key);
+    }
+    else
+    {
+        if (root->left == nullptr && root->right == nullptr)
+        {
+            delete root;
+            root = nullptr;
+        }
+        else if (root->left == nullptr)
+        {
+            Node *temp = root;
+            root = root->right;
+            delete temp;
+            temp = nullptr;
+        }
+        else if (root->right == nullptr)
+        {
+            Node *temp = root;
+            root = root->left;
+            delete temp;
+            temp = nullptr;
+        }
+        else
+        {
+            Node *temp = findMin(root->right);
+            root->key = temp->key;
+            root->value = temp->value;
+            root->right = del(root->right, temp->key);
+        }
+    }
+    return root;
+}
+void printLevelByLevel(Node* root) {
+    if (root == nullptr) {
+        return;
+    }
+
+    queue<Node*> nodesQueue;
+    nodesQueue.push(root);
+
+    while (!nodesQueue.empty()) {
+        int temp = nodesQueue.size();
+        for (int i = 0; i < temp; i++) {
+        Node* currNode = nodesQueue.front();
+        nodesQueue.pop();
+
+        cout << "\t" << currNode->key << "\t" << currNode->value ;
+
+        if (currNode->left != nullptr) {
+            nodesQueue.push(currNode->left);
+        }
+        if (currNode->right != nullptr) {
+            nodesQueue.push(currNode->right);
+        }
+        }
+        cout<<endl;
+    }
+}
 int main()
 {
-    string st;
     int choice;
-    cout << "Enter the prefix Expression you want: ";
-    cin >> st;
-    Node *root = expressionTree(st);
+    Node *root = nullptr;
     do
     {
-        cout << "1.postorder traversal" << endl
-             << "2.level by level" << endl
-             << "3.swappointer" << endl
-             << "4.delete tree" << endl
+        cout << "1.Insert value" << endl
+             << "2.inorder" << endl
+             << "3.search" << endl
+             << "4.find min" << endl
+             << "5.del key" << endl
+             << "6.level" << endl
              << "enter a choice";
         cin >> choice;
         switch (choice)
         {
         case 1:
-            postOrderTraversal(root);
-            break;
+            {char key;
+            string value;
+            cout << "enter key";
+            cin >> key;
+            cout << "enter value";
+            cin >> value;
+            root = insert(root, key, value);
+            break;}
         case 2:
-            level(root);
+            inorder(root);
             break;
         case 3:
-            swaptreepointer(root);
-            break;
+        {
+            char key;
+            cout << "Enter a key to search:";
+            cin >> key;
+            Node *temp = search(root, key);
+            cout << temp->key << " " << temp->value;
+            break;}
         case 4:
-            deletetree(root);
+        {
+            Node *temp = findMin(root);
+            cout << temp->key << " " << temp->value;
+            break;}
+        case 5:
+
+            char key;
+            cout << "Enter a key to delete:";
+            cin >> key;
+            root = del(root, key);
+            break;
+        case 6:
+            printLevelByLevel(root);
             break;
         }
-
-    } while (choice != 5);
+    } while (choice != 7);
 }
