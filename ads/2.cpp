@@ -1,124 +1,131 @@
-#include<iostream>
 #include<bits/stdc++.h>
-#include<list>
 using namespace std;
+const int ite = 100;
+class gtr{
+	public:
+	int V ,limit=0;
+	string loc[ite] = {""};
+	list<int> *head;
+	gtr(int V){
+		this->V = V;
+		head = new list<int>[V];
+	}
+	
+	void addEdge(string v , string w)
+	{
+		int vi = getnum(v);
+		int wi = getnum(w);
+		head[vi].push_back(wi);
+	}
 
-class Graph {
-   int V;    
-   list<int> *head;
-   string loc[7] ={"AMARDHAM","hanuman nagar","tapovan","bali mandir","adgaon","auranagabad naka","janta hall"}  ;
-public:
-   Graph(int V) {    
-      this->V = V;
-      head = new list<int>[V];
-   }
-   void addEdge(int v, int w) {
-      head[v].push_back(w);
-   }
-   
-    void printGraph() {
-      for (int i = 0; i < V; i++) {
-         cout << "Adjacency list of vertex " << loc[i] << ": ";
-         for (auto node : head[i]) {
-            cout << loc[node] << " ";
-            cout<<"-->";
-         }
-         cout << endl;
-      }
-   }
-   void DFSUtil(int v, bool visited[]) {
-      visited[v] = true;
-      cout << loc[v] ;
-      if(v!=6)
-      {
-        cout<< "-->";
-      }
-      for (list<int>::iterator i = head[v].begin(); i != head[v].end(); i++)
-         if (!visited[*i])
-            DFSUtil(*i, visited);
-   }
-   void DFS(int v) {
-      bool *visited = new bool[V];
-      for (int i = 0; i < V; i++)
-         {
-                visited[i] = false;
-         }    
-      DFSUtil(v, visited);
-   }
-   void BFS(int v) 
-   { 
-        bool *visited = new bool[V]; 
-        for (int i = 0; i < V; i++) 
-                visited[i] = false;
+	void printGraph(){
+		for(int i=0;i<V;i++)
+		{
+			cout<<loc[i]<<"-->";
+			for(auto node:head[i]){
+				cout<<loc[node]<<"-->";
+			}
+			cout<<endl;
+		}
+	}
+	void dfsutil(int m, bool visited[]){
+	visited[m] = true;
+	cout<<loc[m]<<"-->";
+	
+	for(auto node:head[m])
+	{
+		if(!visited[node])
+		{ dfsutil(node,visited);
+	}
+	}
+	}
+	void DFS(int m){
+	bool *visited  = new bool[V];
+	for(int i=0;i<V;i++)
+{
+	visited[i]=false;
+}
+	dfsutil(m,visited);
+	}
 
- 
-        queue<int> q;
-        visited[v] = true;
-        q.push(v);
-  
-        while (!q.empty()) {
-        v = q.front();
-        cout << loc[v];
-        if(v!=5)
-      {
-        cout<< "-->";
-      }
-        q.pop();
-     
-        for (list<int>::iterator i = head[v].begin(); i != head[v].end(); i++) {
-        if (!visited[*i]) {
-           visited[*i] = true;
-           q.push(*i);
-        }
-     }
-  }
-
-} 
+ 	void BFS(int m)
+	{
+		bool *visited  = new bool[V];
+		for(int i=0;i<V;i++)
+		{
+			visited[i]=false;
+		}
+		queue<int> q;
+		visited[m]=true;
+		q.push(m);
+		while(!q.empty())
+		{
+		m=q.front();
+		cout<<loc[m]<<"->";
+		q.pop();
+		for(auto i :head[m])
+		{
+			if(!visited[i])
+			{
+				visited[i]=true;
+				q.push(i);
+			}
+		}	
+		}
+	}
+	int getnum(string city)
+	{	
+		for(int i=0;i<limit;i++)
+		{
+			if(city == loc[i])
+			{return i;}
+		}
+		loc[limit] = city;
+		return limit++;	
+	}
 };
-
-int main() {
-    Graph g(7);
-    
-    g.addEdge(0, 1);
-    g.addEdge(0, 2);
-    
-    g.addEdge(1, 3);
-    
-    g.addEdge(2, 6);
-    g.addEdge(3, 4);
-    g.addEdge(3, 5);
-    
-    
-    g.printGraph();
-
-
-        cout<<endl;
-        int choice;
-        do{
-        cout<<"1.DFS \n 2.BFS \n 3.exit"<<endl;
-        cin>>choice;
-        switch(choice)
-        {
-        
-        case 1:
-                cout<<endl;
-                cout << "Depth First Traversal (starting from vertex 0): ";
-                cout<<endl;
-                g.DFS(0);
-                cout<<endl;
-                break;
-         case 2:
-                cout<<endl;
-                cout << "breadth First Traversal (starting from vertex 0): ";
-                cout<<endl;
-                g.BFS(0);
-                cout<<endl;
-                break;
-          case 3:
-                cout<<"exiting"<<endl;
-                return 0;
-        }
-    }while(choice!=3);
-    
-    return 0;
+int main(){
+	cout<<"How many Places you wan to include:";
+	int n,choice;
+	cin>>n;
+	gtr g(n);
+	do{
+	cout<<"1.Add route"<<endl<<"2.print graph"<<endl<<"3.DFS"<<endl<<"4.BFS"<<endl<<"5.exit"<<endl<<"Enter a choice:";
+	cin>>choice;
+	switch(choice)
+	{
+		case 1:
+			{
+				string source ,dest;
+                cout << "Enter source: ";
+    cin >> source;
+    cout << "Enter destination: ";
+    cin >> dest;
+				g.addEdge(source,dest);
+				break;
+			}
+		case 2:
+			{
+				g.printGraph();
+				break;
+			}
+		case 3:
+			{
+				g.DFS(0);
+				break;
+			}
+		case 4:
+			{
+				g.BFS(0);
+				break;
+			}
+		case 5:
+			{
+				cout<<"exiting....."<<endl;
+				return 0; 
+			}
+		
+	}
+}while(choice!=5);
+return 0;	
 }

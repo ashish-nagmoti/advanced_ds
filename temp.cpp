@@ -1,134 +1,131 @@
 #include<bits/stdc++.h>
 using namespace std;
-const int max_city = 100;
-
-class Flight
-{
-	public:	
-	string city_name[max_city] ;
-	int limit = 0;
-
-	int adjMatrix[max_city][max_city]={0};
-
-	struct adjNode{
-	 int dest;
-	 int cost;
-	adjNode *next; 
-	};
+const int ite = 100;
+class gtr{
+	public:
+	int V ,limit=0;
+	string loc[ite] = {""};
+	list<int> *head;
+	gtr(int V){
+		this->V = V;
+		head = new list<int>[V];
+	}
 	
-	adjNode *adjlist[max_city] = {nullptr};
-	
-	void addFlight(string source, string destn, int cost)
+	void addEdge(string v , string w)
 	{
-		int s = getCity(source);
-		int d = getCity(destn);
-		adjMatrix[s][d]= cost;
-		adjNode *temp = new adjNode{d,cost,adjlist[s]};
-		adjlist[s] = temp;
-	}
-	
-	bool isFlight(string source, string dest)
-	{
-		int s = getCity(source);
-		int d = getCity(dest);
-		if(adjMatrix[s][d] > 0)
-		{
-			cout<<"Cities are connected"<<endl;
-			return true;
-		}
-		else
-		{
-			cout<<"Cities are not connected"<<endl;
-			return false;
-		}
+		int vi = getnum(v);
+		int wi = getnum(w);
+		head[vi].push_back(wi);
 	}
 
-	void printAdjMatrix(){
-		cout<<"Adjacency matrix:"<<endl;
-		for(int i=0;i<limit;i++)
+	void printGraph(){
+		for(int i=0;i<V;i++)
 		{
-			for(int j=0;j<limit;j++){
-				cout<<adjMatrix[i][j]<<" ";
-			}
-		cout<<endl;
-		}		
-	}
-	void printAdjList(){
-		cout<<"Adjacency List:"<<endl;
-		for(int i=0;i<limit;i++)
-		{
-			cout<<city_name[i]<<"-->";
-			adjNode *current = adjlist[i];
-			while(current!=NULL)
-			{
-				cout<<"("<<city_name[current->dest]<<","<<current->cost<<")";
-				current = current ->next;
+			cout<<loc[i]<<"-->";
+			for(auto node:head[i]){
+				cout<<loc[node]<<"-->";
 			}
 			cout<<endl;
-		}		
+		}
 	}
-	int getCity(string city)
+	void dfsutil(int m, bool visited[]){
+	visited[m] = true;
+	cout<<loc[m]<<"-->";
+	
+	for(auto node:head[m])
 	{
+		if(!visited[node])
+		{ dfsutil(node,visited);
+	}
+	}
+	}
+	void DFS(int m){
+	bool *visited  = new bool[V];
+	for(int i=0;i<V;i++)
+{
+	visited[i]=false;
+}
+	dfsutil(m,visited);
+	}
+
+ 	void BFS(int m)
+	{
+		bool *visited  = new bool[V];
+		for(int i=0;i<V;i++)
+		{
+			visited[i]=false;
+		}
+		queue<int> q;
+		visited[m]=true;
+		q.push(m);
+		while(!q.empty())
+		{
+		m=q.front();
+		cout<<loc[m]<<"->";
+		q.pop();
+		for(auto i :head[m])
+		{
+			if(!visited[i])
+			{
+				visited[i]=true;
+				q.push(i);
+			}
+		}	
+		}
+	}
+	int getnum(string city)
+	{	
 		for(int i=0;i<limit;i++)
 		{
-			if(city == city_name[i])
-			{ return i;}		
+			if(city == loc[i])
+			{return i;}
 		}
-		city_name[limit] = city;
-		return limit++;
+		loc[limit] = city;
+		return limit++;	
 	}
-	
 };
-int main()
-{
-	Flight f;
-	int choice;
-	do{	
-	cout<<"--------------------------------------------------------------"<<endl;
-	cout<<"1.Enter a flight"<<endl<<"2.Check if flight exist"<<endl<<"3.print adj matrix"<<endl<<"4.print adj list"<<endl<<"5.exit"<<endl<<"enter a choice:";
+int main(){
+	cout<<"How many Places you wan to include:";
+	int n,choice;
+	cin>>n;
+	gtr g(n);
+	do{
+	cout<<"1.Add route"<<endl<<"2.print graph"<<endl<<"3.DFS"<<endl<<"4.BFS"<<endl<<"5.exit"<<endl<<"Enter a choice:";
 	cin>>choice;
 	switch(choice)
 	{
-	 case 1:
-		{string source ,dest;
-		int cost; 
-		cout<<"enter a source:";
-		cin>>source;
-		cout<<"enter a dest:";
-		cin>>dest;
-		cout<<"enter a cost:";
-		cin>>cost;
-		f.addFlight(source,dest,cost);
-		break;}
-	case 2:
-		{string source ,dest;
-	
-		cout<<"enter a source:";
-		cin>>source;
-		cout<<"enter a dest:";
-		cin>>dest;
+		case 1:
+			{
+				string source ,dest;
+                cout << "Enter source: ";
+    cin >> source;
+    cout << "Enter destination: ";
+    cin >> dest;
+				g.addEdge(source,dest);
+				break;
+			}
+		case 2:
+			{
+				g.printGraph();
+				break;
+			}
+		case 3:
+			{
+				g.DFS(0);
+				break;
+			}
+		case 4:
+			{
+				g.BFS(0);
+				break;
+			}
+		case 5:
+			{
+				cout<<"exiting....."<<endl;
+				return 0; 
+			}
 		
-		f.isFlight(source,dest);
-		break;}
-	
-	case 3:
-		{
-			f.printAdjMatrix();
-			break;
-		}
-	case 4:
-		{
-			f.printAdjList();
-			break;
-		}
-	case 5:
-		{
-			cout<<"Exiting"<<endl;
-			return 0;
-		}
 	}
-	
-	
-	}while(choice!=5);
-return 0;
+}while(choice!=5);
+return 0;	
 }
