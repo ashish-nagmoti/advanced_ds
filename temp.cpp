@@ -2,192 +2,105 @@
 using namespace std;
 struct Node
 {
-    char key;
-    string value;
+    int data;
     Node *left;
     Node *right;
-    Node(char k, string v) : key(k), value(v), left(nullptr), right(nullptr){};
+    
+    Node(int data) : data(data), left(nullptr), right(nullptr){};
 };
-Node *insert(Node *root, char key, string value)
+
+Node *buildTree(int pre[], int in[], int instart, int inend, int& preindex)
+{
+    if (instart > inend)
+    {
+        return NULL;
+    }
+    int index;
+    Node *newn = new Node(pre[preindex++]);
+    if (instart == inend)
+    {
+        return newn;
+    }
+    for (int i = instart; i <= inend; i++)
+    {
+        if (in[i] == newn->data)
+        {
+            index = i;
+            break;
+        }
+    }
+    newn->left = buildTree(pre, in, instart, index - 1, preindex);
+    newn->right = buildTree(pre, in, index + 1, inend,  preindex);
+    return newn;
+}
+void printPreorder(Node *root)
 {
     if (root == NULL)
-    {
-        return new Node(key, value);
-    }
-    if (key < root->key)
-    {
-        root->left = insert(root->left, key, value);
-    }
-    else if (key > root->key)
-    {
-        root->right = insert(root->right, key, value);
-    }
-    return root;
-}
-void inorder(Node *root)
-{
-    if (root == nullptr)
-    {
         return;
-    }
-    inorder(root->left);
-    cout << "\t" << root ->key << "\t" << root->value << endl;
-    inorder(root->right);
+    cout << root->data << " ";
+    printPreorder(root->left);
+    printPreorder(root->right);
 }
-Node *search(Node *root, char key)
+
+void printInorder(Node *root)
 {
     if (root == NULL)
-    {
-        return nullptr;
-    }
-    if (root->key == key)
-    {
-        return root;
-    }
-    if (key < root->key)
-    {
-        return search(root->left, key);
-    }
-    else if (key > root->key)
-    {
-        return search(root->right, key);
-    }
-}
-Node *findMin(Node *root)
-{
-    if (root == nullptr)
-    {
-        return nullptr;
-    }
-
-    while (root->left != nullptr)
-    {
-        root = root->left;
-    }
-    return root;
-}
-Node *del(Node *root, char key)
-{
-    if (root == nullptr)
-    {
-        return nullptr;
-    }
-    else if (key < root->key)
-    {
-        root->left = del(root->left, key);
-    }
-    else if (key > root->key)
-    {
-        root->right = del(root->right, key);
-    }
-    else
-    {
-        if (root->left == nullptr && root->right == nullptr)
-        {
-            delete root;
-            root = nullptr;
-        }
-        else if (root->left == nullptr)
-        {
-            Node *temp = root;
-            root = root->right;
-            delete temp;
-            temp = nullptr;
-        }
-        else if (root->right == nullptr)
-        {
-            Node *temp = root;
-            root = root->left;
-            delete temp;
-            temp = nullptr;
-        }
-        else
-        {
-            Node *temp = findMin(root->right);
-            root->key = temp->key;
-            root->value = temp->value;
-            root->right = del(root->right, temp->key);
-        }
-    }
-    return root;
-}
-void printLevelByLevel(Node* root) {
-    if (root == nullptr) {
         return;
-    }
+    printInorder(root->left);
+    cout << root->data << " ";
+    printInorder(root->right);
+}
 
-    queue<Node*> nodesQueue;
-    nodesQueue.push(root);
-
-    while (!nodesQueue.empty()) {
-        int temp = nodesQueue.size();
-        for (int i = 0; i < temp; i++) {
-        Node* currNode = nodesQueue.front();
-        nodesQueue.pop();
-
-        cout << "\t" << currNode->key << "\t" << currNode->value ;
-
-        if (currNode->left != nullptr) {
-            nodesQueue.push(currNode->left);
-        }
-        if (currNode->right != nullptr) {
-            nodesQueue.push(currNode->right);
-        }
-        }
-        cout<<endl;
-    }
+void printPostorder(Node *root)
+{
+    if (root == NULL)
+        return;
+    printPostorder(root->left);
+    printPostorder(root->right);
+    cout << root->data << " ";
 }
 int main()
 {
     int choice;
-    Node *root = nullptr;
+    int n;
+    cout << "No of elements in order:";
+    cin >> n;
+    int pre[n], in[n];
+    for (int i = 0;i < n; i++)
+    {
+        cout << "pre:";
+        cin >> pre[i];
+    }
+    for (int i = 0;i < n; i++)
+    {
+        cout << "in:";
+        cin >> in[i];
+    }
+    int preindex = 0;
+    Node *root = buildTree(pre, in, 0, n - 1, preindex);
+
     do
     {
-        cout << "1.Insert value" << endl
-             << "2.inorder" << endl
-             << "3.search" << endl
-             << "4.find min" << endl
-             << "5.del key" << endl
-             << "6.level" << endl
-             << "enter a choice";
+        cout << "1.preorder" << endl
+             << "2.postorder" << endl
+             << "3.inorder" << endl
+             << "4.exit" << endl
+             << "enter a choice:";
         cin >> choice;
         switch (choice)
         {
         case 1:
-            {char key;
-            string value;
-            cout << "enter key";
-            cin >> key;
-            cout << "enter value";
-            cin >> value;
-            root = insert(root, key, value);
-            break;}
+            printPreorder(root);
+            break;
         case 2:
-            inorder(root);
+            printPostorder(root);
             break;
         case 3:
-        {
-            char key;
-            cout << "Enter a key to search:";
-            cin >> key;
-            Node *temp = search(root, key);
-            cout << temp->key << " " << temp->value;
-            break;}
+            printInorder(root);
+            break;
         case 4:
-        {
-            Node *temp = findMin(root);
-            cout << temp->key << " " << temp->value;
-            break;}
-        case 5:
-
-            char key;
-            cout << "Enter a key to delete:";
-            cin >> key;
-            root = del(root, key);
-            break;
-        case 6:
-            printLevelByLevel(root);
-            break;
+            cout << "exiting";
+            return 0;
         }
-    } while (choice != 7);
+    } while (choice != 4);
 }

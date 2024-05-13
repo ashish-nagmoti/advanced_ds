@@ -1,86 +1,106 @@
-#include<iostream>
+#include <bits/stdc++.h>
 using namespace std;
-
-struct node{
-    int a;
-    node *left;
-    node *right;
+struct Node
+{
+    int data;
+    Node *left;
+    Node *right;
+    
+    Node(int data) : data(data), left(nullptr), right(nullptr){};
 };
 
-node *create(int item){
-    node *ptr = new node;
-    ptr -> a = item;
-    ptr-> left = ptr->right = NULL;
-    return ptr;
-}
-
-node* buildTree(int pre[], int in[], int inStart, int inEnd, int& preIndex) {
-    if (inStart > inEnd)
+Node *buildTree(int pre[], int in[], int instart, int inend, int& preindex)
+{
+    if (instart > inend)
+    {
         return NULL;
-
-    node* newNode = create(pre[preIndex++]);
-
-    if (inStart == inEnd)
-        return newNode;
-
-    int inIndex;
-    for (int i = inStart; i <= inEnd; ++i) {
-        if (in[i] == newNode->a) {
-            inIndex = i;
+    }
+    int index;
+    Node *newn = new Node(pre[preindex++]);
+    if (instart == inend)
+    {
+        return newn;
+    }
+    for (int i = instart; i <= inend; i++)
+    {
+        if (in[i] == newn->data)
+        {
+            index = i;
             break;
         }
     }
-
-    newNode->left = buildTree(pre, in, inStart, inIndex - 1, preIndex);
-    newNode->right = buildTree(pre, in, inIndex + 1, inEnd, preIndex);
-
-    return newNode;
+    newn->left = buildTree(pre, in, instart, index - 1, preindex);
+    newn->right = buildTree(pre, in, index + 1, inend,  preindex);
+    return newn;
 }
-
-void printPreorder(node* root) {
+void printPreorder(Node *root)
+{
     if (root == NULL)
         return;
-    cout << root->a << " ";
+    cout << root->data << " ";
     printPreorder(root->left);
     printPreorder(root->right);
 }
 
-void printInorder(node* root) {
+void printInorder(Node *root)
+{
     if (root == NULL)
         return;
     printInorder(root->left);
-    cout << root->a << " ";
+    cout << root->data << " ";
     printInorder(root->right);
 }
 
-void printPostorder(node* root) {
+void printPostorder(Node *root)
+{
     if (root == NULL)
         return;
     printPostorder(root->left);
     printPostorder(root->right);
-    cout << root->a << " ";
+    cout << root->data << " ";
 }
+int main()
+{
+    int choice;
+    int n;
+    cout << "No of elements in order:";
+    cin >> n;
+    int pre[n], in[n];
+    for (int i = 0;i < n; i++)
+    {
+        cout << "pre:";
+        cin >> pre[i];
+    }
+    for (int i = 0;i < n; i++)
+    {
+        cout << "in:";
+        cin >> in[i];
+    }
+    int preindex = 0;
+    Node *root = buildTree(pre, in, 0, n - 1, preindex);
 
-int main() {
-    int preorder[] = {65, 19, 15, 28, 20, 74, 69, 88, 81, 95};
-    int inorder[] = {15, 19, 20, 28, 65, 69, 74, 81, 88, 95};
-    int n = sizeof(preorder) / sizeof(preorder[0]);
-    int preIndex = 0;
-
-    node* root = buildTree(preorder, inorder, 0, n - 1, preIndex);
-
-    cout << "Preorder traversal of the constructed tree:" << endl;
-    printPreorder(root);
-    cout << endl;
-
-    cout << "Inorder traversal of the constructed tree:" << endl;
-    printInorder(root);
-    cout << endl;
-
-    cout << "Postorder traversal of the constructed tree:" << endl;
-    printPostorder(root);
-    cout << endl;
-
-    return 0;
+    do
+    {
+        cout << "1.preorder" << endl
+             << "2.postorder" << endl
+             << "3.inorder" << endl
+             << "4.exit" << endl
+             << "enter a choice:";
+        cin >> choice;
+        switch (choice)
+        {
+        case 1:
+            printPreorder(root);
+            break;
+        case 2:
+            printPostorder(root);
+            break;
+        case 3:
+            printInorder(root);
+            break;
+        case 4:
+            cout << "exiting";
+            return 0;
+        }
+    } while (choice != 4);
 }
-
