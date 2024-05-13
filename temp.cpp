@@ -2,141 +2,131 @@
 using namespace std;
 struct Node
 {
-    int data;
+    char data;
     Node *left;
     Node *right;
-    Node(int value) : data(value), left(nullptr), right(nullptr) {}
+    Node(char value) : data(value), left(nullptr), right(nullptr) {}
 };
 
-Node *insert(Node *root, int value)
+Node *expressionTree(string prefix)
 {
-    if (root == NULL)
+    stack<Node*> st;
+    for (int i = prefix.size() - 1; i >= 0; i--)
     {
-        return new Node(value);
+        char ch = prefix[i];
+        if (isalnum(ch))
+        {
+            Node *temp = new Node(ch);
+            st.push(temp);
+        }
+        else
+        {
+            Node *temp = new Node(ch);
+            temp->left = st.top();
+            st.pop();
+            temp->right = st.top();
+            st.pop();
+            st.push(temp);
+        }
     }
-    if (value > root->data)
-    {
-        root->right = insert(root->right, value);
-    }
-    else
-    {
-        root->left = insert(root->left, value);
-    }
-    return root;
+    return st.top();
 }
-bool search(int value, Node *root)
-{
-    if (root == nullptr)
-    {
-        return false;
-    }
-    if (root->data == value)
-    {
-        return true;
-    }
-    else if (root->data > value)
-    {
-        return search(value, root->left);
-    }
-    else
-    {
-        return search(value, root->right);
-    }
-}
-void printLevelByLevel(Node *root)
-{
-    if (root == nullptr)
-    {
-        return;
-    }
 
-    queue<Node *> q;
+void level(Node *root)
+{
+    if (root == nullptr)
+    {
+        cout<<"empty tree";
+        return ;
+    }
+    queue<Node*> q;
     q.push(root);
-
+    cout << "level" << endl;
     while (!q.empty())
     {
-        int levelSize = q.size();
+        int level = q.size();
 
-        for (int i = 0; i < levelSize; i++)
+        for (int i = 0; i < level; i++)
         {
-            Node *currentNode = q.front();
+            Node *curr = q.front();
             q.pop();
-
-            cout << currentNode->data << " ";
-
-            if (currentNode->left)
+            cout << curr->data << " ";
+            if (curr->left)
             {
-                q.push(currentNode->left);
+                q.push(curr->left);
             }
-            if (currentNode->right)
+            if (curr->right)
             {
-                q.push(currentNode->right);
+                q.push(curr->right);
             }
         }
         cout << endl;
     }
 }
-void posttraversal(Node *root)
+void postOrderTraversal(Node *root)
 {
-    if (root)
+    if (root == nullptr)
+        cout<<"empty tree";
+        return ;
+    postOrderTraversal(root->left);
+    postOrderTraversal(root->right);
+    cout << root->data << " ";
+}
+
+void swaptreepointer(Node *root)
+{
+    if (root == nullptr)
     {
-        posttraversal(root->left);
-        posttraversal(root->right);
-        cout << root->data << " ";
+        cout<<"empty tree";
+        return ;
     }
+    swap(root->left, root->right);
+    swaptreepointer(root->left);
+    swaptreepointer(root->right);
+}
+void deletetree(Node *root)
+{
+    if (root == nullptr)
+    {
+        return;
+    }
+    deletetree(root->left);
+    deletetree(root->right);
+    cout << "expression to be deleted" << root->data;
+    delete root;
+    root = nullptr;
 }
 
 int main()
 {
-    Node *root = nullptr;
-    int choice, value;
-
+    string st;
+    int choice;
+    cout << "Enter the prefix Expression you want: ";
+    cin >> st;
+    Node *root = expressionTree(st);
     do
     {
-        cout << "\n\t\t\t----Menu----\n\n";
-        cout << "\t1. Insert new node.\n";
-        cout << "\t2. Search for a value.\n";
-        cout << "\t3. Tree traversing by using post-order traversal.\n";
-        cout << "\t4. Exit.\n";
-        cout << "\nEnter your choice : ";
+        cout << "1.postorder traversal" << endl
+             << "2.level by level" << endl
+             << "3.swappointer" << endl
+             << "4.delete tree" << endl
+             << "enter a choice";
         cin >> choice;
-
         switch (choice)
         {
         case 1:
-            cout << "Enter value to insert : ";
-            cin >> value;
-            root = insert(root, value);
+            postOrderTraversal(root);
             break;
-
         case 2:
-            cout << "Enter value to search : ";
-            cin >> value;
-            if (search(value, root))
-            {
-                cout << value << " is present in the BST.\n";
-            }
-            else
-            {
-                cout << value << " is not present in the BST.\n";
-            }
+            level(root);
             break;
-
         case 3:
-            cout << "Postorder Traversal : ";
-            posttraversal(root);
-            cout << endl;
+            swaptreepointer(root);
             break;
-
         case 4:
-            cout << "Exiting the program.\n";
+            deletetree(root);
             break;
-
-        default:
-            cout << "Invalid choice! Please try again.\n";
         }
 
-    } while (choice != 4);
-
-    return 0;
+    } while (choice != 5);
 }

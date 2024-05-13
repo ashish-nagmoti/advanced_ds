@@ -24,6 +24,39 @@ Node *insert(Node *root, int value)
     }
     return root;
 }
+void printLevelByLevel(Node *root)
+{
+    if (root == nullptr)
+    {
+        return;
+    }
+
+    queue<Node *> q;
+    q.push(root);
+
+    while (!q.empty())
+    {
+        int levelSize = q.size();
+
+        for (int i = 0; i < levelSize; i++)
+        {
+            Node *currentNode = q.front();
+            q.pop();
+
+            cout << currentNode->data << " ";
+
+            if (currentNode->left)
+            {
+                q.push(currentNode->left);
+            }
+            if (currentNode->right)
+            {
+                q.push(currentNode->right);
+            }
+        }
+        cout << endl;
+    }
+}
 bool search(int value, Node *root)
 {
     if (root == nullptr)
