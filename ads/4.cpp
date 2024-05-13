@@ -1,71 +1,62 @@
-#include <iostream>
+#include <bits/stdc++.h>
 using namespace std;
-
-
 struct Node
 {
     int data;
-    Node* left;
-    Node* right;
+    Node *left;
+    Node *right;
     Node(int value) : data(value), left(nullptr), right(nullptr) {}
 };
 
-
-Node* insert(Node* root, int value)
+Node *insert(Node *root, int value)
 {
-    if (root == nullptr)
+    if (root == NULL)
     {
         return new Node(value);
     }
-
-    if (value < root->data)
-    {
-        root->left = insert(root->left, value);
-    }
-    else
+    if (value > root->data)
     {
         root->right = insert(root->right, value);
     }
-
+    else
+    {
+        root->left = insert(root->left, value);
+    }
     return root;
 }
-
-
-bool search(Node* root, int value)
+bool search(int value, Node *root)
 {
     if (root == nullptr)
     {
         return false;
     }
-
-    if (value == root->data)
+    if (root->data == value)
     {
         return true;
     }
-    else if (value < root->data)
+    else if (root->data > value)
     {
-        return search(root->left, value);
+        return search(value, root->left);
     }
     else
     {
-        return search(root->right, value);
+        return search(value, root->right);
     }
 }
 
-
-void postTraversal(Node* root)
+void posttraversal(Node *root)
 {
     if (root)
     {
-        postTraversal(root->left);
-        postTraversal(root->right);
+        posttraversal(root->left);
+        posttraversal(root->right);
         cout << root->data << " ";
     }
 }
 
 int main()
 {
-    Node* root = nullptr;
+    Node *root = nullptr;
     int choice, value;
 
     do
@@ -80,37 +71,37 @@ int main()
 
         switch (choice)
         {
-            case 1:
-                cout << "Enter value to insert : ";
-                cin >> value;
-                root = insert(root, value);
-                break;
+        case 1:
+            cout << "Enter value to insert : ";
+            cin >> value;
+            root = insert(root, value);
+            break;
 
-            case 2:
-                cout << "Enter value to search : ";
-                cin >> value;
-                if (search(root, value))
-                {
-                    cout << value << " is present in the BST.\n";
-                }
-                else
-                {
-                    cout << value << " is not present in the BST.\n";
-                }
-                break;
+        case 2:
+            cout << "Enter value to search : ";
+            cin >> value;
+            if (search(value, root))
+            {
+                cout << value << " is present in the BST.\n";
+            }
+            else
+            {
+                cout << value << " is not present in the BST.\n";
+            }
+            break;
 
-            case 3:
-                cout << "Postorder Traversal : ";
-                postTraversal(root);
-                cout << endl;
-                break;
+        case 3:
+            cout << "Postorder Traversal : ";
+            posttraversal(root);
+            cout << endl;
+            break;
 
-            case 4:
-                cout << "Exiting the program.\n";
-                break;
+        case 4:
+            cout << "Exiting the program.\n";
+            break;
 
-            default:
-                cout << "Invalid choice! Please try again.\n";
+        default:
+            cout << "Invalid choice! Please try again.\n";
         }
 
     } while (choice != 4);

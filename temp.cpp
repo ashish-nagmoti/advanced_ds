@@ -1,126 +1,142 @@
 #include <bits/stdc++.h>
 using namespace std;
-const int ite = 100;
-class topo
+struct Node
 {
-public:
-    string name[ite];
-    int limit = 0, V;
-    list<int> *head;
-    topo(int V)
-    {
-        this->V = V;
-        head = new list<int>[V];
-    }
-    void adde(string a, string b)
-    {
-        int ai = getnum(a);
-        int bi = getnum(b);
-        head[ai].push_back(bi);
-    }
-    int getnum(string names)
-    {
-        for (int i = 0; i < limit; i++)
-        {
-            if (names == name[i])
-            {
-                return i;
-            }
-        }
-        name[limit] = names;
-        return limit++;
-    }
-    void printlist()
-    {
-        for (int i = 0; i < V; i++)
-        {
-            cout << name[i] << "-->";
-            for (auto node : head[i])
-            {
-                cout << name[node] << "-->";
-            }
-            cout<<endl;
-        }
-    }
-    void toplogicalsort()
-    {
-        vector<int> indegree(V, 0); // creates vecotor of size  V with all 0
-        // first for loop iterate througha all graph and then 2nd for loop iterate theough node connected to node
-        for (int u = 0; u < V; u++)
-        {
-            for (auto v : head[u])
-            {
-                indegree[v]++;
-            }
-        }
-        queue<int> q;
-
-        for (int u = 0; u < V; u++)
-        {
-            if (indegree[u] == 0)
-            {
-                q.push(u);
-            }
-        }
-        while (!q.empty())
-        {
-            int u = q.front();
-            q.pop();
-            cout << u << " ";
-
-            for (auto v : head[u])
-            {
-                --indegree[v];
-                if (indegree[v] == 0)
-                {
-                    q.push(v);
-                }
-            }
-        }
-    }
+    int data;
+    Node *left;
+    Node *right;
+    Node(int value) : data(value), left(nullptr), right(nullptr) {}
 };
+
+Node *insert(Node *root, int value)
+{
+    if (root == NULL)
+    {
+        return new Node(value);
+    }
+    if (value > root->data)
+    {
+        root->right = insert(root->right, value);
+    }
+    else
+    {
+        root->left = insert(root->left, value);
+    }
+    return root;
+}
+bool search(int value, Node *root)
+{
+    if (root == nullptr)
+    {
+        return false;
+    }
+    if (root->data == value)
+    {
+        return true;
+    }
+    else if (root->data > value)
+    {
+        return search(value, root->left);
+    }
+    else
+    {
+        return search(value, root->right);
+    }
+}
+void printLevelByLevel(Node *root)
+{
+    if (root == nullptr)
+    {
+        return;
+    }
+
+    queue<Node *> q;
+    q.push(root);
+
+    while (!q.empty())
+    {
+        int levelSize = q.size();
+
+        for (int i = 0; i < levelSize; i++)
+        {
+            Node *currentNode = q.front();
+            q.pop();
+
+            cout << currentNode->data << " ";
+
+            if (currentNode->left)
+            {
+                q.push(currentNode->left);
+            }
+            if (currentNode->right)
+            {
+                q.push(currentNode->right);
+            }
+        }
+        cout << endl;
+    }
+}
+void posttraversal(Node *root)
+{
+    if (root)
+    {
+        posttraversal(root->left);
+        posttraversal(root->right);
+        cout << root->data << " ";
+    }
+}
+
 int main()
 {
-    int n, choice;
-    cout << "Total no. of tasks:";
-    cin >> n;
-    topo t(n);
+    Node *root = nullptr;
+    int choice, value;
+
     do
     {
-        cout << "1.add edge" << endl
-             << "2.display list" << endl
-             << "3.topological sort" << endl
-             << "4.exit" << endl
-             << "Enter A choice:";
+        cout << "\n\t\t\t----Menu----\n\n";
+        cout << "\t1. Insert new node.\n";
+        cout << "\t2. Search for a value.\n";
+        cout << "\t3. Tree traversing by using post-order traversal.\n";
+        cout << "\t4. Exit.\n";
+        cout << "\nEnter your choice : ";
         cin >> choice;
+
         switch (choice)
         {
         case 1:
-        {
-            string a, b;
-            cout << "task 1:";
-            cin >> a;
-            cout << "task 2:";
-            cin >> b;
-            t.adde(a, b);
+            cout << "Enter value to insert : ";
+            cin >> value;
+            root = insert(root, value);
             break;
-        }
+
         case 2:
-        {
-            t.printlist();
+            cout << "Enter value to search : ";
+            cin >> value;
+            if (search(value, root))
+            {
+                cout << value << " is present in the BST.\n";
+            }
+            else
+            {
+                cout << value << " is not present in the BST.\n";
+            }
             break;
-        }
+
         case 3:
-        {
-            t.toplogicalsort();
+            cout << "Postorder Traversal : ";
+            posttraversal(root);
+            cout << endl;
             break;
-        }
+
         case 4:
-        {
-            cout << "exiting" << endl;
-            return 0;
+            cout << "Exiting the program.\n";
+            break;
+
+        default:
+            cout << "Invalid choice! Please try again.\n";
         }
-        }
-       
-    } while (choice != 5);
+
+    } while (choice != 4);
+
+    return 0;
 }
