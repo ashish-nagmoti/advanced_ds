@@ -1,0 +1,65 @@
+-- Create the Student table
+CREATE TABLE Student (
+  studentid INT PRIMARY KEY,
+  studentname VARCHAR(50),
+  instructorid INT,
+  studentcity VARCHAR(50)
+);
+
+-- Insert values into the Student table
+INSERT INTO Student (studentid, studentname, instructorid, studentcity)
+VALUES
+(1, 'Alice', 101, 'Mumbai'),
+(2, 'Bob', 102, 'Pune'),
+(3, 'Charlie', 103, 'Delhi'),
+(4, 'David', 104, 'Pune'),
+(5, 'Eve', 105, 'Mumbai');
+
+-- Create the Instructor table
+CREATE TABLE Instructor (
+  instructorid INT PRIMARY KEY,
+  Instructorname VARCHAR(50),
+  instructorcity VARCHAR(50),
+  specialization VARCHAR(50)
+);
+
+-- Insert values into the Instructor table
+INSERT INTO Instructor (instructorid, Instructorname, instructorcity, specialization)
+VALUES
+(101, 'John', 'Mumbai', 'Computer'),
+(102, 'Alice', 'Pune', 'Mathematics'),
+(103, 'Bob', 'Delhi', 'Physics'),
+(104, 'Charlie', 'Pune', 'Computer'),
+(105, 'David', 'Mumbai', 'Chemistry');
+
+-- 1. Find the instructor of each student using INNER JOIN
+SELECT s.studentname, i.Instructorname
+FROM Student s
+INNER JOIN Instructor i ON s.instructorid = i.instructorid;
+
+-- 2. Find the student who is not having any instructor using LEFT JOIN
+SELECT s.studentname
+FROM Student s
+LEFT JOIN Instructor i ON s.instructorid = i.instructorid
+WHERE i.instructorid IS NULL;
+
+-- 3. Find the student who is not having any instructor as well as instructor who is not having student using FULL JOIN
+SELECT COALESCE(s.studentname, 'No Student') AS student_name, COALESCE(i.Instructorname, 'No Instructor') AS instructor_name
+FROM Student s
+JOIN Instructor i ON s.instructorid = i.instructorid
+WHERE s.instructorid IS NULL OR i.instructorid IS NULL;
+
+-- 4. Find the students whose instructor’s specialization is computer using INNER JOIN
+SELECT s.studentname
+FROM Student s
+right JOIN Instructor i ON s.instructorid = i.instructorid
+WHERE i.specialization = 'Computer';
+
+-- Create a view containing the total number of students whose instructor belongs to "Pune"
+CREATE VIEW students_in_pune AS
+SELECT COUNT(s.studentid) AS total_students_in_pune
+FROM Student s
+INNER JOIN Instructor i ON s.instructorid = i.instructorid
+WHERE i.instructorcity = 'Pune';
+
+SELECT * FROM students_in_pune;

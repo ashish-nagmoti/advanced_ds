@@ -1,0 +1,41 @@
+-- Enable Profiling
+SET profiling = 1;
+
+-- Create the employee table
+CREATE TABLE employee (
+  empno INT AUTO_INCREMENT,
+  empname VARCHAR(50),
+  designation VARCHAR(50),
+  city VARCHAR(50),
+  salary INT,
+  zipcode VARCHAR(10),
+  county VARCHAR(50),
+  PRIMARY KEY (empno)
+);
+
+-- Insert data into the employee table
+INSERT INTO employee (empname, designation, city, salary, zipcode, county)
+VALUES
+  ('John Doe', 'Manager', 'Mumbai', 45000, '400001', 'Maharashtra'),
+  ('Jane Smith', 'Developer', 'Mumbai', 35000, '400002', 'Maharashtra'),
+  ('Bob Johnson', 'Analyst', 'Pune', 55000, '411001', 'Maharashtra'),
+  ('Sarah Lee', 'Developer', 'Mumbai', 40000, '400003', 'Maharashtra'),
+  ('Tom Wilson', 'Manager', 'Bangalore', 60000, '560001', 'Karnataka');
+
+-- Create an index on the county column
+CREATE INDEX idx_county ON employee(county);
+
+-- Create a view to filter employees with low salary in Mumbai
+CREATE VIEW low_salary_mumbai AS
+SELECT empno, empname, designation, city, salary, zipcode, county
+FROM employee
+WHERE salary < 50000 AND city = 'Mumbai';
+
+-- Select data from the view
+SELECT * FROM low_salary_mumbai;
+
+-- Select data from the employee table using the idx_county index
+SELECT * FROM employee USE INDEX(idx_county);
+
+-- Show the profiles to view the execution times
+SHOW PROFILES;

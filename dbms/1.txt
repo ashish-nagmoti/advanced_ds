@@ -1,0 +1,167 @@
+CREATE TABLE employee (
+  employee_name varchar(30),
+  street varchar(30),
+  city varchar(30),
+  primary key(employee_name)
+);
+
+CREATE TABLE company (
+  company_name varchar(30),
+  city varchar(30),
+  primary key(company_name)
+);
+
+CREATE TABLE works (
+  employee_name varchar(30) ,
+  company_name varchar(30),
+  salary int,
+ foreign key(employee_name) references employee(employee_name),
+ foreign key(company_name) references company(company_name)
+ 
+);
+
+CREATE TABLE manages (
+  employee_name varchar(30),
+  manager_name varchar(30),
+  foreign key(employee_name) references employee(employee_name)
+);
+
+-- insert
+INSERT INTO employee VALUES ('Ash', 'pawan_nagar', 'nashik');
+INSERT INTO employee VALUES ('Om', 'cidco', 'nagpur');
+INSERT INTO employee VALUES ('Pawan', 'pawan_nagar', 'nashik');
+INSERT INTO employee VALUES ('Chait', 'cidco', 'nagpur');
+INSERT INTO employee VALUES ('Krushna', 'clg_road', 'pune');
+INSERT INTO employee VALUES ('neelay', 'gangapur_road', 'mumbai');
+INSERT INTO employee VALUES ('shar', 'trimurti', 'nashik');
+INSERT INTO employee VALUES ('vari', 'clg_road', 'pune');
+INSERT INTO employee VALUES ('shra', 'pawan_nagar', 'nashik');
+INSERT INTO employee VALUES ('vani', 'gangapur_road', 'mumbai');
+
+INSERT INTO company VALUES ('ESDS', 'nashik');
+INSERT INTO company VALUES ('first_bank', 'nagpur');
+INSERT INTO company VALUES ('small_bank', 'pune');
+INSERT INTO company VALUES ('tcs', 'mumbai');
+
+INSERT INTO works VALUES('Ash','ESDS',20000);
+INSERT INTO works VALUES('Om','first_bank',10000);
+INSERT INTO works VALUES('Pawan','ESDS',40000);
+INSERT INTO works VALUES('Chait','small_bank',8000);
+INSERT INTO works VALUES('Krushna','tcs',4000);
+INSERT INTO works VALUES('neelay','first_bank',30000);
+INSERT INTO works VALUES('shar','small_bank',50000);
+INSERT INTO works VALUES('vari','tcs',10000);
+INSERT INTO works VALUES('shra','ESDS',15000);
+INSERT INTO works VALUES('vani','first_bank',35000);
+
+INSERT INTO manages VALUES('Ash','Pawan');
+INSERT INTO manages VALUES('Om','neelay');
+INSERT INTO manages VALUES('Chait','shar');
+INSERT INTO manages VALUES('Krushna','vari');
+INSERT INTO manages VALUES('shra','Pawan');
+INSERT INTO manages VALUES('neelay','vani');
+
+
+
+
+-- -- fetch 
+-- 1. Find the names of all employees who work for First Bank Corporation.
+SELECT employee_name 
+FROM works
+WHERE company_name = 'first_bank';
+
+-- 2. Find the names and cities of residence of all employees who work for First Bank Corporation
+SELECT e.employee_name, e.city
+FROM employee e
+JOIN works w ON e.employee_name = w.employee_name
+WHERE w.company_name = 'first_bank';
+
+-- 3. Find the names, street addresses, and cities of residence of all employees who work for First Bank Corporation and earn more than Rs.10,000.
+SELECT e.employee_name, e.street, e.city
+FROM employee e
+JOIN works w ON e.employee_name = w.employee_name
+WHERE w.company_name = 'first_bank' AND w.salary > 10000;
+
+-- 4. Find all employees in the database who live in the same cities as the companies for which they work.
+SELECT e.employee_name
+FROM employee e
+JOIN works w ON e.employee_name = w.employee_name
+JOIN company c ON w.company_name = c.company_name
+WHERE e.city = c.city;
+
+-- 5. Find all employees in the database who live in the same cities and on the same streets as do their managers.
+SELECT e.employee_name
+FROM employee e
+JOIN manages m ON e.employee_name = m.employee_name
+JOIN employee ee ON m.manager_name = ee.employee_name
+WHERE e.city = ee.city AND e.street = ee.street;
+
+-- 6. Find all employees in the database who do not work for First Bank Corporation.
+SELECT e.employee_name
+FROM employee e
+JOIN works w ON e.employee_name = w.employee_name
+WHERE w.company_name !='first_bank';
+
+-- 7. Find all employees in the database who earn more than each employee of Small Bank Corporation.
+SELECT e.employee_name
+FROM employee e
+JOIN works w ON e.employee_name = w.employee_name
+WHERE w.salary > ALL (
+  SELECT salary
+  FROM works
+  WHERE company_name = 'small_bank'
+);
+
+-- 8. Assume that the companies may be located in several cities. Find all companies located in every city in which Small Bank Corporation is located.
+SELECT c.company_name
+FROM company c
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM (
+    SELECT city
+    FROM company
+    WHERE company_name = 'small_bank'
+  ) AS small_bank_cities
+  WHERE small_bank_cities.city NOT IN (
+    SELECT city
+    FROM company
+    WHERE company_name = c.company_name
+  )
+);
+
+-- 9. Find all employees who earn more than the average salary of all employees of their company.
+SELECT e.employee_name
+FROM employee e
+JOIN works w ON e.employee_name = w.employee_name
+WHERE w.salary > (
+  SELECT AVG(salary)
+  FROM works
+  WHERE company_name = w.company_name
+);
+
+-- 10. Find the company that has the most employees.
+SELECT w.company_name, COUNT(*) AS num_employees
+FROM works w
+GROUP BY w.company_name
+ORDER BY num_employees DESC
+LIMIT 1;
+
+-- 11. Find the company that has the smallest payroll.
+SELECT w.company_name, SUM(w.salary) AS total_payroll
+FROM works w
+GROUP BY w.company_name
+ORDER BY total_payroll ASC
+LIMIT 1;
+
+-- 12. Find those companies whose employees earn a higher salary, on average, than the average salary at First Bank Corporation.
+SELECT c.company_name
+FROM company c
+JOIN works w ON c.company_name = w.company_name
+GROUP BY c.company_name
+HAVING AVG(w.salary) > (
+  SELECT AVG(salary)
+  FROM works
+  WHERE company_name = 'first_bank'
+);
+
+-- select * from employee;
