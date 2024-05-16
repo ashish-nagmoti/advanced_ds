@@ -1,69 +1,56 @@
 #include<stdio.h>
 int main()
 {
-	printf("Enter a number of process");
-	int np = 0;
-	scanf("%d",&np);
-	int pid[np],at[np],bt[np],ct[np],wt[np],tat[np];
-	int avgwt=0, avgtat=0;
-	for(int i=0;i<np;i++)
+	int n;
+	printf("Enter no. of process");
+	scanf("%d",&n);
+	int pri[n],pro[n],at[n],bt[n],ct[n],tat[n],wt[n],bbt[n];
+
+	for(int i=0;i<n;i++)
 	{
-	printf("Enter id for process %d: ", i+1);
-	scanf("%d",&pid[i]);
+	pri[i] = pro[i] = at[i] = bt[i] = tat[i]= ct[i] =wt[i] = bbt[i] = 0;
+    }
+	for (int i = 0; i < n; i++) {
+       	 printf("Enter ID of process %d:", i + 1);
+        	scanf("%d", &pro[i]);
 
-	printf("Enter arrival time for process %d: ", i+1);
-	scanf("%d",&at[i]);
+	printf("Enter Priority of process %d:", i + 1);
+        	scanf("%d", &pri[i]);
 
-	printf("Enter burst time for process %d: ", i+1);
-	scanf("%d",&bt[i]);
+        	printf("Enter Arrival Time of process %d:", i + 1);
+        	scanf("%d", &at[i]);
 
-	printf("---------------------------------------------------------");
+       	 printf("Enter Burst Time of process %d:", i + 1);
+        	scanf("%d", &bt[i]);
+        	bbt[i] = bt[i];
 
-	if(i==0)
+    	}
+	int current_time=0,selected_pid =0, max_pri=0, selected_pindex =0 , comp = 0;
+	printf("gantt chart");
+	while(comp<n)
 	{
-		ct[i] = bt[i];
-	}
-	else
-	{ct[i]=ct[i-1] +bt[i];}
-	tat[i] = ct[i] - at[i];
-	wt[i] = tat[i] - bt[i];
-
-	avgwt += wt[i];
-	avgtat += tat[i];
-	}
-	avgwt = avgwt /np;
-	avgtat = avgtat /np;
-
-	printf("\n----------------------------------------------------");
-	printf("|PID \t Arrival time \t Burst time \t ct \t tat \t wt| \n");
-	for(int i=0;i<np;i++)
+            max_pri = 0;
+	for(int i=0;i<n;i++)
 	{
-	printf("|%3d \tt %3d \t\t %3d \t %3d \t %3d \t %3d|\n",pid[i],at[i],bt[i],ct[i],tat[i],wt[i]);
+		if(at[i] <= current_time && max_pri <pri[i] && bt[i] > 0)
+		{
+		selected_pid = pro[i];
+		selected_pindex = i;
+		max_pri = pri[i];
+		}
 	}
-
-	printf("\n----------------------------------------------------");
-	printf("| Avg Waiting Time: %d|\n", avgwt);
-    printf("| Avg Turnaround Time: %d|\n", avgtat);
-    printf("-------------------------------------------------------------------------------------------------------\n");
-	printf("grantt chart:\n");
 	
-	for(int i=0;i<np;i++)
+	bt[selected_pindex]--;
+	current_time++;
+for(int i =0;i<n;i++)
 	{
-	printf("|%d",pid[i]);
+	if(bt[i] ==0 && ct[i] == 0)
+	{
+	ct[i] = current_time;
+	comp++;
+	printf("P%d",selected_pid);
 	}
-	printf("|\n");
-    for(int i = 0; i <= np; i++)
-{
-    if(i == 0)
-    {
-        printf("0  ");
-    }
-    else
-    {
-        printf("%d  ", ct[i - 1]);
-    }
-}
-
-
-    return 0;
-}
+	}
+	}
+	
+	}
