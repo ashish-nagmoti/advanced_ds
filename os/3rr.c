@@ -19,12 +19,16 @@ void round_robin(struct Process processes[], int n, int quantum) {
     int completed = 0;
 
     printf("\n\nGantt Chart:\n");
-    printf("0");
-
+    
     while (completed < n) {
         for (int i = 0; i < n; i++) {
-            if (processes[i].remaining_time > 0) {
-                int execute_time = min(processes[i].remaining_time, quantum);
+            int execute_time = 0 ;
+            if (processes[i].remaining_time > 0 && processes[i].arrival_time <= current_time) {
+                if(processes[i].remaining_time == quantum) {
+                    execute_time = quantum;
+                    }
+                    else{
+                execute_time= min(processes[i].remaining_time, quantum);}
                 processes[i].remaining_time -= execute_time;
                 current_time += execute_time;
 
