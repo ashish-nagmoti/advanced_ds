@@ -41,6 +41,14 @@ int main() {
                 printf("-\t");
             }
         }
+        if (page_found)
+        {
+            printf("hit\t");
+        }
+        else
+        {
+            printf("miss\t");
+        }
         printf("\n");
     }
 
